@@ -1,0 +1,71 @@
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background-color: #f9f9f9;
+}
+header {
+  background-color: #111;
+  color: white;
+  padding: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.logo {
+  height: 50px;
+}
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 1em;
+}
+nav a {
+  color: white;
+  text-decoration: none;
+}
+.banner {
+  background: #e21b1b;
+  color: white;
+  padding: 2em;
+  text-align: center;
+}
+section {
+  padding: 2em;
+}
+.producto {
+  background: white;
+  border-radius: 8px;
+  padding: 1em;
+  margin: 1em 0;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+.producto img {
+  width: 100%;
+  max-width: 300px;
+}
+.precio {
+  font-weight: bold;
+  color: green;
+}
+.whatsapp {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #25D366;
+  color: white;
+  padding: 0.8em 1em;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: bold;
+}
+footer {
+  background: #111;
+  color: white;
+  padding: 2em;
+  text-align: center;
+}
+footer .redes img {
+  width: 24px;
+  margin: 0 5px;
+}
