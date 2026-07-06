@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Registrate en Click24Web para recibir ofertas inmobiliarias segun lo que estas buscando.">
+  <title>Click24Web | Registro de Clientes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root {
+      --bg: #efe7ff;
+      --surface: rgba(249, 245, 255, 0.94);
+      --surface-strong: #ffffff;
+      --surface-soft: #f4eeff;
+      --border: rgba(124, 58, 237, 0.18);
+      --border-strong: rgba(124, 58, 237, 0.32);
+      --text: #1f1147;
+      --text-muted: #625c7c;
+      --text-soft: #8c87a3;
+      --primary: #7c3aed;
+      --primary-2: #8b5cf6;
+      --primary-3: #c4b5fd;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --shadow: 0 30px 80px -36px rgba(76, 29, 149, 0.38);
+      --radius: 24px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --transition: .18s ease;
+    }
+
+    html {
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top left, rgba(196, 181, 253, 0.98), transparent 32%),
+        radial-gradient(circle at top right, rgba(167, 139, 250, 0.38), transparent 26%),
+        radial-gradient(circle at bottom right, rgba(139, 92, 246, 0.18), transparent 28%),
+        linear-gradient(180deg, #fbf8ff 0%, #efe6ff 100%);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--text);
+      background: transparent;
+    }
+
+    .page-shell {
+      width: min(980px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 56px;
+    }
+
+    .hero {
+      display: block;
+    }
+
+    .form-panel {
+      background: var(--surface);
+      border: 1px solid rgba(139, 92, 246, 0.14);
+      backdrop-filter: blur(20px);
+      box-shadow: var(--shadow);
+      border-radius: 32px;
+    }
+
+    .form-panel {
+      padding: 30px 26px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(248, 243, 255, 0.96)),
+        var(--surface);
+    }
+
+    .form-brand {
+      margin-bottom: 14px;
+      display: inline-flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .form-brand strong {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      color: var(--primary);
+      line-height: 1;
+    }
+
+    .form-brand span {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .2em;
+      color: var(--text-soft);
+      text-transform: uppercase;
+    }
+
+    .form-head {
+      padding: 6px 4px 20px;
+      border-bottom: 1px solid rgba(124, 58, 237, 0.1);
+      margin-bottom: 22px;
+    }
+
+    .form-head h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+
+    .form-head p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--text-muted);
+    }
+
+    .form-section + .form-section {
+      margin-top: 18px;
+    }
+
+    .section-title {
+      margin: 0 0 12px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .11em;
+      color: var(--primary);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .field,
+    .field-full {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .field-full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .label-soft {
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--text-soft);
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+      font: inherit;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--surface-strong);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 13px 14px;
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--primary-2);
+      box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.12);
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .inline-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.82);
+      color: var(--text-muted);
+      border-radius: 999px;
+      padding: 11px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform var(--transition), border-color var(--transition), background var(--transition), color var(--transition), box-shadow var(--transition);
+      user-select: none;
+    }
+
+    .pill:hover {
+      transform: translateY(-1px);
+      border-color: var(--border-strong);
+      color: var(--text);
+    }
+
+    .pill.on {
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      border-color: transparent;
+      box-shadow: 0 12px 22px -18px rgba(124, 58, 237, 0.9);
+    }
+
+    .pill.on-multi {
+      color: var(--primary);
+      background: rgba(124, 58, 237, 0.1);
+      border-color: rgba(124, 58, 237, 0.26);
+    }
+
+    .tag-box {
+      border: 1px solid var(--border);
+      background: var(--surface-strong);
+      border-radius: 14px;
+      padding: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      min-height: 52px;
+      cursor: text;
+    }
+
+    .tag-box input {
+      flex: 1;
+      min-width: 160px;
+      border: none;
+      box-shadow: none;
+      padding: 4px;
+      background: transparent;
+    }
+
+    .tag-box input:focus {
+      box-shadow: none;
+    }
+
+    .tag-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: rgba(124, 58, 237, 0.1);
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .tag-remove {
+      border: none;
+      background: none;
+      color: inherit;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .subtle-card {
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .status {
+      display: none;
+      margin-bottom: 16px;
+      padding: 13px 14px;
+      border-radius: 16px;
+      font-size: 13.5px;
+      line-height: 1.55;
+      border: 1px solid transparent;
+    }
+
+    .status.show { display: block; }
+    .status.success {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.22);
+      color: #0f766e;
+    }
+    .status.error {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.18);
+      color: #b91c1c;
+    }
+    .status.warning {
+      background: rgba(245, 158, 11, 0.11);
+      border-color: rgba(245, 158, 11, 0.2);
+      color: #b45309;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(124, 58, 237, 0.1);
+    }
+
+    .actions small {
+      display: block;
+      max-width: 34ch;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--text-soft);
+    }
+
+    .submit-btn {
+      border: none;
+      border-radius: 16px;
+      padding: 15px 22px;
+      min-width: 230px;
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+      cursor: pointer;
+      background: linear-gradient(135deg, #7c3aed, #6366f1);
+      box-shadow: 0 24px 34px -24px rgba(76, 29, 149, 0.72);
+      transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 28px 36px -22px rgba(76, 29, 149, 0.8);
+    }
+
+    .submit-btn:disabled {
+      opacity: .72;
+      cursor: wait;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .foot-note {
+      margin-top: 22px;
+      text-align: center;
+      font-size: 12.5px;
+      color: var(--text-soft);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 1040px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-panel {
+        position: relative;
+        top: auto;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page-shell {
+        width: min(100% - 20px, 680px);
+        padding: 16px 0 32px;
+      }
+
+      .form-panel {
+        border-radius: 24px;
+        padding: 20px;
+      }
+
+      .grid,
+      .inline-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .submit-btn {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .pill {
+        min-height: 44px;
+        justify-content: center;
+      }
+
+      .actions small {
+        order: 2;
+        max-width: none;
+        text-align: center;
+      }
+
+      input,
+      select,
+      textarea,
+      button {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <div class="hero">
+      <main class="form-panel">
+        <div class="form-head">
+          <div class="form-brand">
+            <strong>Click24Web</strong>
+            <span>CRM INMOBILIARIO</span>
+          </div>
+          <h1>Registrate para recibir propiedades</h1>
+          <p>
+            Completá tus datos y tus preferencias de búsqueda. Vamos a usarlos para enviarte oportunidades
+            que realmente tengan sentido para vos.
+          </p>
+        </div>
+
+        <div id="status-box" class="status"></div>
+
+        <form id="public-lead-form" novalidate>
+          <section class="form-section">
+            <h3 class="section-title">Datos de contacto</h3>
+            <div class="grid">
+              <div class="field">
+                <label for="nombre">Nombre completo *</label>
+                <input id="nombre" name="nombre" type="text" placeholder="Ej: Juan Garcia" autocomplete="name" required>
+              </div>
+              <div class="field">
+                <label for="telefono">Telefono / WhatsApp *</label>
+                <input id="telefono" name="telefono" type="tel" placeholder="Ej: 1155551234" autocomplete="tel" required>
+              </div>
+              <div class="field">
+                <label class="label-soft">Paso 1: zona</label>
+                <select id="zona" name="zona">
+                  <option value="">Seleccionar zona...</option>
+                  <option value="Capital Federal">Capital Federal</option>
+                  <option value="Gran Buenos Aires">Gran Buenos Aires / AMBA</option>
+                  <option value="Interior Provincia">Interior Provincia</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="localidad">Paso 2: lugar especifico</label>
+                <select id="localidad" name="localidad" disabled>
+                  <option value="">Seleccionar una zona primero...</option>
+                </select>
+              </div>
+              <div class="field-full">
+                <label for="barrio-input">Barrios de interes (opcional)</label>
+                <div class="tag-box" id="barrio-box">
+                  <div id="barrios-list"></div>
+                  <input id="barrio-input" type="text" placeholder="Ej: Palermo, Belgrano..." autocomplete="off">
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <h3 class="section-title">Que estas buscando</h3>
+            <div class="grid">
+              <div class="field-full">
+                <label>Tipo de operacion</label>
+                <div class="pill-group" id="operacion-group"></div>
+              </div>
+              <div class="field-full">
+                <label>Tipo de propiedad</label>
+                <div class="subtle-card">
+                  <div class="pill-group" id="tipo-group"></div>
+                </div>
+              </div>
+              <div class="field">
+                <label for="ambientes">Ambientes</label>
+                <select id="ambientes" name="ambientes">
+                  <option value="">Indistinto</option>
+                  <option value="Monoambiente">Monoambiente</option>
+                  <option value="1">1 ambiente</option>
+                  <option value="2">2 ambientes</option>
+                  <option value="3">3 ambientes</option>
+                  <option value="4">4 ambientes</option>
+                  <option value="5">5+ ambientes</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="cochera">Cochera</label>
+                <select id="cochera" name="cochera">
+                  <option value="">Indiferente</option>
+                  <option value="Si">Si</option>
+                  <option value="No">No</option>
+                  <option value="Indiferente">Indiferente</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <h3 class="section-title">Presupuesto y financiacion</h3>
+            <div class="grid">
+              <div class="field-full">
+                <label>Rango de presupuesto</label>
+                <div class="inline-grid">
+                  <input id="presupuesto-min" name="presupuesto-min" type="number" min="0" step="10000" placeholder="Minimo">
+                  <input id="presupuesto-max" name="presupuesto-max" type="number" min="0" step="10000" placeholder="Maximo">
+                </div>
+              </div>
+              <div class="field">
+                <label for="moneda">Moneda</label>
+                <select id="moneda" name="moneda">
+                  <option value="USD">USD</option>
+                  <option value="ARS">ARS</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Credito hipotecario</label>
+                <div class="pill-group" id="credito-group"></div>
+              </div>
+              <div class="field-full">
+                <label>Forma de pago</label>
+                <div class="pill-group" id="financiacion-group"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <h3 class="section-title">Comentarios</h3>
+            <div class="grid">
+              <div class="field-full">
+                <label for="notas">Detalles importantes</label>
+                <textarea id="notas" name="notas" placeholder="Ej: busco balcon, apto profesional, cerca del subte, mudanza urgente, etc."></textarea>
+              </div>
+            </div>
+          </section>
+
+          <div class="actions">
+            <small>
+              Si ya estabas registrado con este mismo telefono, no vamos a duplicar tu solicitud.
+              En ese caso te avisamos y conservamos el contacto existente.
+            </small>
+            <button id="submit-btn" class="submit-btn" type="submit">Quiero recibir ofertas</button>
+          </div>
+        </form>
+
+        <div class="foot-note">
+          Click24Web · Registro publico conectado al CRM inmobiliario.
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const supabaseUrl = 'https://piuhuwkkgdfzyukhngli.supabase.co';
+    const supabaseKey = 'sb_publishable_OriN8olSNsIPo6lysdUCnQ_j_SoMT0d';
+    const supabaseClient = window.supabase?.createClient
+      ? window.supabase.createClient(supabaseUrl, supabaseKey)
+      : null;
+
+    const ZONAS = ['Capital Federal', 'Gran Buenos Aires', 'Interior Provincia'];
+    const sortStringsEs = items => [...items].sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+    const LOCALIDADES_DATA = Object.fromEntries(
+      Object.entries({
+        'Capital Federal': [
+          'Agronomia', 'Almagro', 'Balvanera', 'Barracas', 'Belgrano', 'Boedo', 'Caballito', 'Chacarita',
+          'Coghlan', 'Colegiales', 'Constitucion', 'Flores', 'Floresta', 'La Boca', 'La Paternal',
+          'Liniers', 'Mataderos', 'Monte Castro', 'Montserrat', 'Nueva Pompeya', 'Nunez', 'Palermo',
+          'Parque Avellaneda', 'Parque Chacabuco', 'Parque Chas', 'Parque Patricios', 'Puerto Madero',
+          'Recoleta', 'Retiro', 'Saavedra', 'San Cristobal', 'San Nicolas', 'San Telmo', 'Velez Sarsfield',
+          'Versalles', 'Villa Crespo', 'Villa del Parque', 'Villa Devoto', 'Villa General Mitre',
+          'Villa Lugano', 'Villa Luro', 'Villa Ortuzar', 'Villa Pueyrredon', 'Villa Real', 'Villa Riachuelo',
+          'Villa Santa Rita', 'Villa Soldati', 'Villa Urquiza'
+        ],
+        'Gran Buenos Aires': [
+          'Almirante Brown', 'Avellaneda', 'Berazategui', 'Berisso', 'Brandsen', 'Campana',
+          'Canuelas', 'Ensenada', 'Escobar', 'Esteban Echeverria', 'Exaltacion de la Cruz',
+          'Ezeiza', 'Florencio Varela', 'General Las Heras', 'General Rodriguez',
+          'General San Martin', 'Hurlingham', 'Ituzaingo', 'Jose C. Paz', 'La Matanza',
+          'La Plata', 'Lanus', 'Lomas de Zamora', 'Lujan', 'Malvinas Argentinas',
+          'Marcos Paz', 'Merlo', 'Moreno', 'Moron', 'Pilar', 'Presidente Peron',
+          'Quilmes', 'San Fernando', 'San Isidro', 'San Miguel', 'San Vicente',
+          'Tigre', 'Tres de Febrero', 'Vicente Lopez', 'Zarate'
+        ],
+        'Interior Provincia': [
+          'Adolfo Alsina', 'Adolfo Gonzales Chaves', 'Alberti', 'Arrecifes', 'Ayacucho',
+          'Azul', 'Bahia Blanca', 'Balcarce', 'Baradero', 'Benito Juarez', 'Bolivar',
+          'Bragado', 'Capitan Sarmiento', 'Carlos Casares', 'Carlos Tejedor',
+          'Carmen de Areco', 'Castelli', 'Chacabuco', 'Chascomus', 'Chivilcoy',
+          'Colon', 'Coronel Dorrego', 'Coronel Pringles', 'Coronel Rosales',
+          'Coronel Suarez', 'Daireaux', 'Dolores', 'Florentino Ameghino',
+          'General Alvarado', 'General Alvear', 'General Arenales', 'General Belgrano',
+          'General Guido', 'General La Madrid', 'General Lavalle', 'General Madariaga',
+          'General Paz', 'General Pinto', 'General Pueyrredon', 'General Viamonte',
+          'General Villegas', 'Guamini', 'Hipolito Yrigoyen', 'Junin', 'La Costa',
+          'Laprida', 'Las Flores', 'Leandro N. Alem', 'Lezama', 'Lincoln', 'Loberia',
+          'Lobos', 'Magdalena', 'Maipu', 'Mar Chiquita', 'Mercedes', 'Monte',
+          'Monte Hermoso', 'Navarro', 'Necochea', 'Nueve de Julio', 'Olavarria',
+          'Patagones', 'Pehuajo', 'Pellegrini', 'Pergamino', 'Pila', 'Pinamar',
+          'Puan', 'Punta Indio', 'Ramallo', 'Rauch', 'Rivadavia', 'Rojas',
+          'Roque Perez', 'Saavedra', 'Saladillo', 'Salliquelo', 'Salto',
+          'San Andres de Giles', 'San Antonio de Areco', 'San Cayetano',
+          'San Nicolas', 'San Pedro', 'Suipacha', 'Tandil', 'Tapalque', 'Tordillo',
+          'Tornquist', 'Trenque Lauquen', 'Tres Arroyos', 'Tres Lomas',
+          'Veinticinco de Mayo', 'Villa Gesell', 'Villarino'
+        ]
+      }).map(([zona, localidades]) => [zona, sortStringsEs(localidades)])
+    );
+
+    const OPERACIONES = [
+      'Compra',
+      'Alquiler anual',
+      'Alquiler comercial',
+      'Alquiler temporario'
+    ];
+
+    const TIPOS = [
+      'Casa', 'Casa quinta', 'Chalet', 'Cochera', 'Departamento',
+      'Duplex', 'Galpon', 'Local comercial', 'Loft', 'Lote',
+      'Monoambiente', 'Oficina', 'PH', 'Quinta', 'Terreno', 'Triplex'
+    ].sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+
+    const CREDITOS = ['Si', 'No', 'En tramite', 'No aplica'];
+    const FINANCIACION_COMPRA = [
+      'Anticipo y saldo financiado',
+      'Contado',
+      'En pozo',
+      'Financiación particular',
+      'Sin definir'
+    ];
+    const FINANCIACION_ALQUILER = ['Pago anual', 'Pago mensual', 'Pago semestral'];
+
+    let selectedZona = '';
+    let selectedBarrios = [];
+    let selectedOperacion = 'Compra';
+    let selectedTipos = [];
+    let selectedCredito = 'No';
+    let selectedFinanciacion = '';
+    let isSubmitting = false;
+
+    function uid() {
+      return 'L-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    }
+
+    function normalizePhone(value) {
+      let digits = String(value || '').replace(/\D/g, '');
+      if (digits.startsWith('549') && digits.length >= 12) digits = digits.slice(3);
+      else if (digits.startsWith('54') && digits.length >= 12) digits = digits.slice(2);
+      return digits.replace(/^0+/, '');
+    }
+
+    function showStatus(type, text) {
+      const box = document.getElementById('status-box');
+      box.className = `status show ${type}`;
+      box.textContent = text;
+      box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function clearStatus() {
+      const box = document.getElementById('status-box');
+      box.className = 'status';
+      box.textContent = '';
+    }
+
+    function renderSinglePills(containerId, items, selectedValue, onClick) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = items.map(item => `
+        <button type="button" class="pill ${selectedValue === item ? 'on' : ''}" data-val="${item}">
+          ${item}
+        </button>
+      `).join('');
+      [...container.querySelectorAll('.pill')].forEach(btn => {
+        btn.addEventListener('click', () => onClick(btn.dataset.val));
+      });
+    }
+
+    function renderMultiPills(containerId, items, selectedValues, onClick) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = items.map(item => `
+        <button type="button" class="pill ${selectedValues.includes(item) ? 'on-multi' : ''}" data-val="${item}">
+          ${item}
+        </button>
+      `).join('');
+      [...container.querySelectorAll('.pill')].forEach(btn => {
+        btn.addEventListener('click', () => onClick(btn.dataset.val));
+      });
+    }
+
+    function syncZonaSelect() {
+      const zonaSelect = document.getElementById('zona');
+      if (!zonaSelect) return;
+      zonaSelect.value = selectedZona;
+    }
+
+    function populateLocalidades(zona) {
+      const select = document.getElementById('localidad');
+      select.disabled = !zona;
+      select.innerHTML = '<option value="">Seleccionar lugar...</option>';
+      if (!zona) {
+        select.innerHTML = '<option value="">Seleccionar una zona primero...</option>';
+        return;
+      }
+      LOCALIDADES_DATA[zona].forEach(loc => {
+        const option = document.createElement('option');
+        option.value = loc;
+        option.textContent = loc;
+        select.appendChild(option);
+      });
+    }
+
+    function handleZonaChange(zona) {
+      selectedZona = zona;
+      syncZonaSelect();
+      populateLocalidades(zona);
+    }
+
+    function renderBarrios() {
+      const list = document.getElementById('barrios-list');
+      const input = document.getElementById('barrio-input');
+      list.innerHTML = selectedBarrios.map((barrio, index) => `
+        <span class="tag-badge">
+          ${barrio}
+          <button type="button" class="tag-remove" data-index="${index}">×</button>
+        </span>
+      `).join('');
+      [...list.querySelectorAll('.tag-remove')].forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedBarrios.splice(Number(btn.dataset.index), 1);
+          renderBarrios();
+          input.focus();
+        });
+      });
+    }
+
+    function handleBarrioKeydown(event) {
+      const input = event.target;
+      const value = input.value.trim();
+
+      if (event.key === 'Enter' || event.key === ',') {
+        event.preventDefault();
+        const cleaned = value.replace(/,$/, '').trim();
+        if (cleaned && !selectedBarrios.includes(cleaned)) {
+          selectedBarrios.push(cleaned);
+          renderBarrios();
+        }
+        input.value = '';
+      } else if (event.key === 'Backspace' && !value && selectedBarrios.length) {
+        selectedBarrios.pop();
+        renderBarrios();
+      }
+    }
+
+    function renderOperacion() {
+      renderSinglePills('operacion-group', OPERACIONES, selectedOperacion, operacion => {
+        selectedOperacion = operacion;
+        if (operacion !== 'Compra') {
+          selectedCredito = 'No aplica';
+        } else if (selectedCredito === 'No aplica') {
+          selectedCredito = 'No';
+        }
+        renderOperacion();
+        renderCredito();
+        renderFinanciacion();
+      });
+    }
+
+    function renderTipos() {
+      renderMultiPills('tipo-group', TIPOS, selectedTipos, tipo => {
+        if (selectedTipos.includes(tipo)) {
+          selectedTipos = selectedTipos.filter(item => item !== tipo);
+        } else {
+          selectedTipos = [...selectedTipos, tipo];
+        }
+        renderTipos();
+      });
+    }
+
+    function renderCredito() {
+      renderSinglePills('credito-group', CREDITOS, selectedCredito, credito => {
+        if (selectedOperacion !== 'Compra' && credito !== 'No aplica') return;
+        selectedCredito = credito;
+        renderCredito();
+      });
+    }
+
+    function renderFinanciacion() {
+      const options = selectedOperacion === 'Compra' ? FINANCIACION_COMPRA : FINANCIACION_ALQUILER;
+      if (!options.includes(selectedFinanciacion)) selectedFinanciacion = '';
+      renderSinglePills('financiacion-group', options, selectedFinanciacion, financiacion => {
+        selectedFinanciacion = financiacion;
+        renderFinanciacion();
+      });
+    }
+
+    function setSubmitting(value) {
+      isSubmitting = value;
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = value;
+      btn.textContent = value ? 'Guardando registro...' : 'Quiero recibir ofertas';
+    }
+
+    async function findDuplicateByPhone(phone) {
+      if (!supabaseClient) return null;
+      const { data, error } = await supabaseClient
+        .from('leads')
+        .select('id,nombre,telefono')
+        .limit(5000);
+
+      if (error) throw error;
+
+      const normalized = normalizePhone(phone);
+      return (data || []).find(lead => normalizePhone(lead.telefono) === normalized) || null;
+    }
+
+    function buildLeadRow() {
+      const nombre = document.getElementById('nombre').value.trim();
+      const telefono = document.getElementById('telefono').value.trim();
+      const localidad = document.getElementById('localidad').value.trim();
+      const presupuestoMin = parseFloat(document.getElementById('presupuesto-min').value) || 0;
+      const presupuestoMax = parseFloat(document.getElementById('presupuesto-max').value) || 0;
+      const moneda = document.getElementById('moneda').value;
+      const notas = document.getElementById('notas').value.trim();
+      const hoy = new Date();
+      const fecha = hoy.toISOString().split('T')[0];
+      const seguimientoTexto = 'Lead ingresado desde formulario publico de registro.';
+      const notasCompuestas = [
+        notas,
+        selectedBarrios.length ? `Barrios de interes: ${selectedBarrios.join(', ')}` : ''
+      ].filter(Boolean).join(' | ');
+
+      return {
+        id: uid(),
+        nombre,
+        telefono,
+        owner: 'admin',
+        localidad,
+        barrio: selectedBarrios.join(', '),
+        operacion: selectedOperacion,
+        tipopropiedad: selectedTipos,
+        ambientes: document.getElementById('ambientes').value,
+        cochera: document.getElementById('cochera').value,
+        presupuestomin: presupuestoMin,
+        presupuestomax: presupuestoMax,
+        moneda,
+        creditohipotecario: selectedCredito,
+        financiacion: selectedFinanciacion,
+        etapa: 'Nuevo',
+        origen: 'Registro Web',
+        notas: notasCompuestas,
+        creadoen: fecha,
+        proximocontacto: fecha,
+        updatedat: hoy.toISOString(),
+        seguimiento: [
+          {
+            id: uid(),
+            tipo: '📝 Nota',
+            texto: seguimientoTexto,
+            fecha,
+            hora: hoy.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
+          }
+        ]
+      };
+    }
+
+    function resetForm() {
+      document.getElementById('public-lead-form').reset();
+      selectedZona = '';
+      selectedBarrios = [];
+      selectedOperacion = 'Compra';
+      selectedTipos = [];
+      selectedCredito = 'No';
+      selectedFinanciacion = '';
+      document.getElementById('localidad').innerHTML = '<option value="">Seleccionar una zona primero...</option>';
+      document.getElementById('localidad').disabled = true;
+      syncZonaSelect();
+      renderBarrios();
+      renderOperacion();
+      renderTipos();
+      renderCredito();
+      renderFinanciacion();
+    }
+
+    async function submitPublicLead(event) {
+      event.preventDefault();
+      if (isSubmitting) return;
+
+      clearStatus();
+
+      const nombre = document.getElementById('nombre').value.trim();
+      const telefono = document.getElementById('telefono').value.trim();
+
+      if (!nombre) {
+        showStatus('error', 'Por favor ingresá tu nombre completo.');
+        return;
+      }
+
+      if (!telefono) {
+        showStatus('error', 'Por favor ingresá tu teléfono o WhatsApp.');
+        return;
+      }
+
+      if (!selectedOperacion) {
+        showStatus('error', 'Elegí qué tipo de operación estás buscando.');
+        return;
+      }
+
+      if (false) {
+        showStatus('warning', 'Necesitamos tu autorización para poder contactarte.');
+        return;
+      }
+
+      if (!supabaseClient) {
+        showStatus('error', 'No se pudo conectar con la base de datos en este momento.');
+        return;
+      }
+
+      try {
+        setSubmitting(true);
+
+        const duplicate = await findDuplicateByPhone(telefono);
+        if (duplicate) {
+          showStatus(
+            'warning',
+            'Ya tenemos un registro con ese teléfono. No hace falta volver a anotarte: revisamos la solicitud existente y te contactamos si hay novedades.'
+          );
+          return;
+        }
+
+        const row = buildLeadRow();
+        const { error } = await supabaseClient.from('leads').insert(row);
+        if (error) throw error;
+
+        resetForm();
+        showStatus(
+          'success',
+          'Listo. Tu búsqueda quedó registrada correctamente y ya ingresó al CRM. Si encontramos opciones acordes, te vamos a contactar.'
+        );
+      } catch (error) {
+        console.error(error);
+        showStatus(
+          'error',
+          'No pudimos guardar tu registro en este momento. Probá nuevamente en unos segundos.'
+        );
+      } finally {
+        setSubmitting(false);
+      }
+    }
+
+    function init() {
+      syncZonaSelect();
+      renderBarrios();
+      renderOperacion();
+      renderTipos();
+      renderCredito();
+      renderFinanciacion();
+
+      document.getElementById('public-lead-form').addEventListener('submit', submitPublicLead);
+      document.getElementById('zona').addEventListener('change', event => handleZonaChange(event.target.value));
+      document.getElementById('barrio-box').addEventListener('click', () => {
+        document.getElementById('barrio-input').focus();
+      });
+      document.getElementById('barrio-input').addEventListener('keydown', handleBarrioKeydown);
+    }
+
+    init();
+  </script>
+</body>
+</html>
